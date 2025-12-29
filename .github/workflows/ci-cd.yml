@@ -20,13 +20,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven'
       
       - name: Compile backend
         run: |
           cd backend
-          chmod +x mvnw
-          ./mvnw clean compile -DskipTests
+          mvn clean compile -DskipTests
 
   build-frontend:
     name: Build Frontend
@@ -44,7 +42,7 @@ jobs:
       - name: Install and check frontend
         run: |
           cd frontend
-          npm ci
+          npm install
           echo "Frontend dependencies installed successfully"
 
   security-scan:
