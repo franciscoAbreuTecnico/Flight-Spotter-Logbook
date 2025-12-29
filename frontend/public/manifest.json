@@ -1,0 +1,9 @@
+{
+  "name": "Flight Spotter Logbook",
+  "short_name": "FSL",
+  "description": "Record and share aircraft sightings",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb"
+}

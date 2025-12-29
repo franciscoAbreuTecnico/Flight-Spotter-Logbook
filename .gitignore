@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+target/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.pem
+.vercel
+
+# Java
+*.class
+*.jar
+*.war
+
+# Keep example files
+!.env.example
+
+# Documentation - ignore all README/docs except root README.md
+*.md
+!README.md
+docs/
+ADMIN-SETUP.md
+API-ABUSE-SOLUTIONS.md
+DEPLOYMENT.md
+DEPLOYMENT-CHECKLIST.md
+GITHUB-DEPLOYMENT.md
+HEROKU-DEPLOYMENT.md
+HEROKU-QUICK-START.md
+QUICK-REFERENCE.md
+SECURITY-AUDIT.md
+SECURITY-FIXES.md
+SECURITY-TESTING.md
+SETUP.md
+TEST-SUITE-SUMMARY.md
+TESTING.md

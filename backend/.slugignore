@@ -1,0 +1,24 @@
+# Heroku slug ignore - files/folders to exclude from deployment
+# This reduces slug size and deployment time
+
+# Test files
+src/test/
+*.test.java
+*Test.java
+
+# Test resources
+src/test/resources/
+
+# Documentation
+*.md
+docs/
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Git
+.git/
+.gitignore
+.gitattributes
