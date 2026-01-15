@@ -23,6 +23,16 @@ spring:
 server:
   port: ${PORT:8080}
 
+# Actuator endpoints for health checks (Render requires /actuator/health)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
 logging:
   level:
     org.springframework.security: INFO

@@ -1,0 +1,88 @@
+# Render Blueprint - Infrastructure as Code
+# Deploy your entire Flight Spotter Logbook stack with one click!
+# https://render.com/docs/blueprint-spec
+
+services:
+  # ==========================================
+  # Backend - Spring Boot Java API
+  # ==========================================
+  - type: web
+    name: flight-spotter-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: oregon # Change to your preferred region
+    plan: free # Options: free, starter, standard, pro
+    healthCheckPath: /actuator/health
+    envVars:
+      # Database connection (automatically injected from Render PostgreSQL)
+      - key: JDBC_DATABASE_URL
+        fromDatabase:
+          name: flight-spotter-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: flight-spotter-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: flight-spotter-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: flight-spotter-db
+          property: password
+      # JWT/Auth Configuration (set these in Render Dashboard)
+      - key: JWKS_URI
+        sync: false # User must set this manually
+      - key: ROLE_CLAIM_FIELD
+        value: role
+      # CORS - Will be set after frontend deploys
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      # Cloudinary (set these in Render Dashboard)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # OpenSky Network (optional)
+      - key: OPENSKY_CLIENT_ID
+        sync: false
+      - key: OPENSKY_CLIENT_SECRET
+        sync: false
+      # Server port
+      - key: PORT
+        value: 8080
+
+  # ==========================================
+  # Frontend - Next.js Application
+  # ==========================================
+  - type: web
+    name: flight-spotter-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    region: oregon
+    plan: free
+    envVars:
+      # Backend URL (set after backend deploys)
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false
+      # Clerk Auth (set these in Render Dashboard)
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+
+# ==========================================
+# PostgreSQL Database
+# ==========================================
+databases:
+  - name: flight-spotter-db
+    databaseName: flight_spotter_logbook
+    user: logbook_user
+    region: oregon
+    plan: free # Options: free, starter, standard, pro
+    postgresMajorVersion: "14"
