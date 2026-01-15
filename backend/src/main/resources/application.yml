@@ -2,8 +2,9 @@ spring:
   application:
     name: flight-spotter-logbook
   datasource:
-    # Heroku provides JDBC_DATABASE_URL; fall back to SPRING_DATASOURCE_URL for local dev
-    url: ${JDBC_DATABASE_URL:${SPRING_DATASOURCE_URL}}
+    # Render provides DATABASE_URL in postgres:// format, Spring Boot auto-converts to JDBC
+    # For local dev, use SPRING_DATASOURCE_URL with jdbc:postgresql:// format
+    url: ${DATABASE_URL:${SPRING_DATASOURCE_URL}}
     username: ${SPRING_DATASOURCE_USERNAME:}
     password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:

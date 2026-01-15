@@ -16,22 +16,10 @@ services:
     healthCheckPath: /actuator/health
     envVars:
       # Database connection (automatically injected from Render PostgreSQL)
-      - key: JDBC_DATABASE_URL
+      - key: DATABASE_URL
         fromDatabase:
           name: flight-spotter-db
           property: connectionString
-      - key: SPRING_DATASOURCE_URL
-        fromDatabase:
-          name: flight-spotter-db
-          property: connectionString
-      - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: flight-spotter-db
-          property: user
-      - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: flight-spotter-db
-          property: password
       # JWT/Auth Configuration (set these in Render Dashboard)
       - key: JWKS_URI
         sync: false # User must set this manually
