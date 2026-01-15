@@ -41,7 +41,7 @@ Flight Spotter Logbook allows users to document their aircraft sightings with de
 ### Infrastructure
 - **Database**: PostgreSQL 15
 - **Containerization**: Docker + Docker Compose
-- **Deployment**: Heroku (backend), Vercel (frontend)
+- **Deployment**: Render (recommended), Heroku, or Vercel
 
 ## Repository Structure
 
@@ -291,7 +291,114 @@ Migrations are located in `backend/src/main/resources/db/migration/`
 
 ## Deployment
 
-### Backend Deployment (Heroku)
+### Render Deployment (Recommended)
+
+Render provides a simple, free-tier deployment with a Blueprint file for one-click setup.
+
+#### Prerequisites
+
+- GitHub account with this repository (fork or clone)
+- Render account (https://render.com)
+- External service credentials ready (Clerk, Cloudinary)
+
+#### Option 1: One-Click Deploy with Blueprint
+
+1. **Connect GitHub to Render**:
+   - Go to https://dashboard.render.com
+   - Click **New** → **Blueprint**
+   - Connect your GitHub account and select this repository
+
+2. **Review Services**:
+   Render will detect `render.yaml` and create:
+   - `flight-spotter-db` - PostgreSQL database
+   - `flight-spotter-backend` - Spring Boot API
+   - `flight-spotter-frontend` - Next.js application
+
+3. **Configure Environment Variables**:
+   After creation, go to each service → **Environment** and add:
+
+   **Backend** (`flight-spotter-backend`):
+   ```
+   JWKS_URI=https://your-clerk-instance.clerk.accounts.dev/.well-known/jwks.json
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   CORS_ALLOWED_ORIGINS=https://flight-spotter-frontend.onrender.com
+   OPENSKY_CLIENT_ID=your_opensky_id (optional)
+   OPENSKY_CLIENT_SECRET=your_opensky_secret (optional)
+   ```
+
+   **Frontend** (`flight-spotter-frontend`):
+   ```
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key
+   CLERK_SECRET_KEY=sk_test_your_secret
+   NEXT_PUBLIC_BACKEND_URL=https://flight-spotter-backend.onrender.com
+   ```
+
+4. **Deploy**:
+   - Click **Apply** to create all services
+   - Wait for builds to complete (5-10 minutes)
+
+#### Option 2: Manual Setup
+
+1. **Create PostgreSQL Database**:
+   - Render Dashboard → **New** → **PostgreSQL**
+   - Name: `flight-spotter-db`
+   - Plan: Free
+   - Copy the **Internal Database URL**
+
+2. **Deploy Backend**:
+   - **New** → **Web Service**
+   - Connect repository, set root directory to `backend`
+   - Runtime: Docker
+   - Add environment variables (see above)
+   - Add `DATABASE_URL` with the internal database URL
+
+3. **Deploy Frontend**:
+   - **New** → **Web Service**
+   - Connect repository, set root directory to `frontend`
+   - Runtime: Docker
+   - Add environment variables (see above)
+
+#### Post-Deployment Setup
+
+1. **Configure Clerk Domain**:
+   - Go to [Clerk Dashboard](https://dashboard.clerk.com) → **Domains**
+   - Add your frontend URL: `https://flight-...-frontend.onrender.com`
+
+2. **Set Up Admin User**:
+   Connect to the database and insert your admin role:
+   ```bash
+   # Get connection string from Render → Database → Connect → External
+   psql "your_external_database_url?sslmode=require"
+   
+   # Insert admin role (get user_id from Clerk Dashboard → Users)
+   INSERT INTO user_roles (user_id, role, granted_by, notes) 
+   VALUES ('user_xxxxx', 'ADMIN', 'system', 'Initial admin setup');
+   ```
+
+3. **Verify Deployment**:
+   ```bash
+   # Check backend health
+   curl https://flight-spotter-backend.onrender.com/actuator/health
+   
+   # Should return: {"status":"UP"}
+   ```
+
+#### Render URLs
+
+After deployment, your application will be available at:
+- **Frontend**: `https://flight-spotter-frontend.onrender.com`
+- **Backend API**: `https://flight-spotter-backend.onrender.com`
+- **Health Check**: `https://flight-spotter-backend.onrender.com/actuator/health`
+
+> **Note**: Free tier services spin down after 15 minutes of inactivity. First request may take 30-60 seconds to wake up.
+
+---
+
+### Alternative: Heroku Deployment
+
+#### Backend Deployment (Heroku)
 
 1. Create Heroku app:
 ```bash
@@ -315,7 +422,7 @@ heroku config:set CLOUDINARY_CLOUD_NAME="your_cloud_name"
 git subtree push --prefix backend heroku main
 ```
 
-### Frontend Deployment (Vercel)
+#### Frontend Deployment (Vercel)
 
 1. Import repository in Vercel dashboard
 2. Set root directory to `frontend`
