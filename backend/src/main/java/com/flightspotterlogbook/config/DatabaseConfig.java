@@ -40,11 +40,10 @@ public class DatabaseConfig {
         // Handle Render's postgres:// or postgresql:// format
         if (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")) {
             try {
-                // Replace postgres:// or postgresql:// with a valid URI scheme for parsing
-                String uriString = databaseUrl;
-                if (uriString.startsWith("postgres://")) {
-                    uriString = "postgresql" + uriString.substring(8); // postgres:// -> postgresql://
-                }
+                // Convert to a parseable URI format (use http as temp scheme for parsing)
+                String uriString = databaseUrl
+                    .replace("postgres://", "http://")
+                    .replace("postgresql://", "http://");
                 
                 URI dbUri = new URI(uriString);
                 
@@ -56,6 +55,8 @@ public class DatabaseConfig {
                     String[] parts = userInfo.split(":", 2);
                     username = parts[0];
                     password = parts.length > 1 ? parts[1] : "";
+                } else if (userInfo != null) {
+                    username = userInfo;
                 }
                 
                 // Build JDBC URL
@@ -71,7 +72,7 @@ public class DatabaseConfig {
                     jdbcUrl.append("?").append(dbUri.getQuery());
                 }
                 
-                System.out.println("Configured database connection to: " + dbUri.getHost());
+                System.out.println("Configured database connection to: " + dbUri.getHost() + ":" + dbUri.getPort());
                 
                 return DataSourceBuilder.create()
                     .url(jdbcUrl.toString())
@@ -88,6 +89,6 @@ public class DatabaseConfig {
             return DataSourceBuilder.create().url(databaseUrl).build();
         }
         
-        throw new RuntimeException("Unsupported DATABASE_URL format. Expected postgres://, postgresql://, or jdbc: URL");
+        throw new RuntimeException("Unsupported DATABASE_URL format: " + databaseUrl.substring(0, Math.min(20, databaseUrl.length())) + "... Expected postgres://, postgresql://, or jdbc: URL");
     }
 }
